@@ -16,7 +16,7 @@ var ModRing = /** @class */ (function () {
      * Expression is valide if it contains only numbers, n, +, -, *, /, and ^
      */
     ModRing.prototype.validateExpression = function () {
-        var regex = /^[0-9n+\-*/^]+$/;
+        var regex = /^[0-9n+\-*/^()]+$/;
         return regex.test(this.expression);
     };
     /**
@@ -25,7 +25,9 @@ var ModRing = /** @class */ (function () {
      */
     ModRing.prototype.evaluateExpression = function (n) {
         this.validateExpression();
-        var expression = this.expression.replace(/(\d*)n/, "$1*n");
+        var expression = this.expression.replace(/(\d+)n/, "$1*n")
+            .replace("^", "**");
+        console.log("Evaluting " + expression + " at n=" + n);
         var evaluation = eval(expression); //urgh
         if (typeof evaluation === 'number') {
             return evaluation;
@@ -34,16 +36,7 @@ var ModRing = /** @class */ (function () {
             throw new Error('Invalid expression');
         }
     };
-    /**
-     * Gets coordinates of ith point on the ring
-     * @param i th point to get coordinates for
-     */
-    ModRing.prototype.point = function (i) {
-        var step = 2 * Math.PI / this.modulus;
-        var angle = i * step;
-    };
     ModRing.prototype.drawIn = function (canvas) {
-        console.log('Drawing in canvas');
         var ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Canvas not supported');
@@ -52,12 +45,39 @@ var ModRing = /** @class */ (function () {
         var height = canvas.height = this.height;
         var center = [width / 2, height / 2];
         var radius = width * 0.45;
-        console.log("ctx.arc(" + center[0] + ", " + center[1] + ", " + radius + ", 0, 2 * Math.PI);");
         ctx.clearRect(0, 0, width, height);
-        ctx.strokeStyle = 'black';
         ctx.beginPath();
         ctx.arc(center[0], center[1], radius, 0, 2 * Math.PI);
         ctx.stroke();
+        ctx.closePath();
+        // Draw points and labels
+        for (var i = 0; i < this.modulus; i++) {
+            var x = radius * Math.cos(2 * Math.PI * i / this.modulus);
+            var y = -radius * Math.sin(2 * Math.PI * i / this.modulus);
+            var x2 = (radius + 10) * Math.cos(2 * Math.PI * i / this.modulus);
+            var y2 = -(radius + 10) * Math.sin(2 * Math.PI * i / this.modulus);
+            // Draw a dot at the point
+            ctx.beginPath();
+            ctx.arc(center[0] + x, center[1] + y, 3, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.strokeText(i.toString(), center[0] + x2, center[1] + y2);
+            ctx.closePath();
+        }
+        for (var i = 0; i < this.modulus; i++) {
+            var x = radius * Math.cos(2 * Math.PI * i / this.modulus);
+            var y = -radius * Math.sin(2 * Math.PI * i / this.modulus);
+            var j = this.evaluateExpression(i);
+            var xj = radius * Math.cos(2 * Math.PI * j / this.modulus);
+            var yj = -radius * Math.sin(2 * Math.PI * j / this.modulus);
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(center[0] + x, center[0] + y);
+            ctx.lineTo(center[0] + xj, center[0] + yj);
+            ctx.stroke();
+            ctx.closePath();
+        }
     };
     return ModRing;
 }());

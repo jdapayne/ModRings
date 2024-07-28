@@ -6,16 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const nInput = document.getElementById('n') as HTMLInputElement|null;
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const modRing = new ModRing();
-
-  document.getElementById('form')?.addEventListener('submit', (event) => {
-    event.preventDefault();
+  
+  function getInfoAndDraw() {
     const expression = expressionInput?.value ?? 'n';
     const n = parseInt(nInput?.value ?? '10');
     modRing.expression = expression;
     modRing.modulus = n;
     modRing.drawIn(canvas);
-  });
+  }
 
+  document.getElementById('form')?.addEventListener('change', getInfoAndDraw);
+  
+  getInfoAndDraw();
 });
 
 function error(message: string) {
