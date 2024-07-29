@@ -51,15 +51,16 @@ export default class ModRing {
     for (let i = 0; i < this.modulus; i++) {
       const x = radius * Math.cos(2 * Math.PI * i / this.modulus);
       const y = -radius * Math.sin(2 * Math.PI * i / this.modulus);
-      const x2 = (radius + 10) * Math.cos(2 * Math.PI * i / this.modulus);
-      const y2 = -(radius + 10) * Math.sin(2 * Math.PI * i / this.modulus);
+      const x2 = (radius + 15) * Math.cos(2 * Math.PI * i / this.modulus);
+      const y2 = -(radius + 15) * Math.sin(2 * Math.PI * i / this.modulus);
       // Draw a dot at the point
       ctx.beginPath();
       ctx.arc(center[0] + x, center[1] + y, 3, 0, 2 * Math.PI);
       ctx.fill();
+      ctx.font = '15px ABeeZee, sans-serif';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
-      ctx.strokeText(i.toString(), center[0] + x2, center[1] + y2);
+      ctx.fillText(i.toString(), center[0] + x2, center[1] + y2);
       ctx.closePath();
     }
   }
@@ -76,6 +77,8 @@ export default class ModRing {
 
     ctx.clearRect(0, 0, width, height);
     this.drawCircle(ctx, center, radius);
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
     
     if (this.singlePath) {
       this.drawPathIn(ctx, center, radius);
@@ -92,7 +95,6 @@ export default class ModRing {
       const xj = radius * Math.cos(2 * Math.PI * j / this.modulus);
       const yj = -radius * Math.sin(2 * Math.PI * j / this.modulus);
 
-      ctx.strokeStyle = 'red';
       ctx.beginPath();
       ctx.moveTo(center[0] + x, center[0] + y);
       ctx.lineTo(center[0] + xj, center[0] + yj);
@@ -122,7 +124,6 @@ export default class ModRing {
       const xj = radius * Math.cos(2 * Math.PI * j / this.modulus);
       const yj = -radius * Math.sin(2 * Math.PI * j / this.modulus);
 
-      ctx.strokeStyle = 'red';
       ctx.beginPath();
       ctx.moveTo(center[0] + x, center[0] + y);
       ctx.lineTo(center[0] + xj, center[0] + yj);
