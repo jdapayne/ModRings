@@ -4,6 +4,7 @@ export default class ModRing {
   expression: string = 'n';
   modulus: number = 10;
   singlePath: boolean = false;
+  start: number = 1;
 
   constructor(width = 500, height = 500, modulus = 10) {
     this.width = width;
@@ -110,7 +111,8 @@ export default class ModRing {
     }
   }
 
-  drawPathIn(ctx: CanvasRenderingContext2D, center: number[], radius: number, start: number = 1) {
+  drawPathIn(ctx: CanvasRenderingContext2D, center: number[], radius: number) {
+    const start = this.start;
     let path: number[] = [];
     let current = start;
     while (true) {

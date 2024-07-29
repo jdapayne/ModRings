@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const expressionInput = document.getElementById('expression') as HTMLInputElement | null;
   const nInput = document.getElementById('n') as HTMLInputElement | null;
   const singlePath = document.getElementById('path') as HTMLInputElement | null;
+  const startInput = document.getElementById('start') as HTMLInputElement | null;
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
   const modRing = new ModRing();
 
@@ -12,9 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const expression = expressionInput?.value ?? 'n';
     const n = parseInt(nInput?.value ?? '10');
     const single = singlePath?.checked ?? false;
+    const start = parseInt(startInput?.value ?? '1');
     modRing.expression = expression;
     modRing.modulus = n;
     modRing.singlePath = single;
+    modRing.start = start;
     modRing.drawIn(canvas);
   }
 
