@@ -40,14 +40,15 @@ export default class ModRing {
   }
 
   /**
-   * Draws the circle with labels on the canvas
-   * @param ctx CanvasRenderingContext2D The context to draw the circle in
+   * Draws the circle with labels in the SVG.
    */
-  drawCircle(ctx: CanvasRenderingContext2D, center: number[], radius: number) {
-    ctx.beginPath();
-    ctx.arc(center[0], center[1], radius, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.closePath();
+  drawCircle(svg: SVGSVGElement, center: number[], radius: number) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', center[0].toString());
+    circle.setAttribute('cy', center[1].toString());
+    circle.setAttribute('r', radius.toString());
+    circle.setAttribute('class', 'mod-ring-circle');
+    svg.appendChild(circle);
 
     const fontSize = this.modulus > 30 ? 35 : 45;
     const offset = this.modulus > 30 ? 30 : 35;
@@ -59,41 +60,45 @@ export default class ModRing {
       const y = -radius * Math.sin(angle);
       const x2 = (radius + offset) * Math.cos(angle);
       const y2 = -(radius + offset) * Math.sin(angle);
-      // Draw a dot at the point
-      ctx.beginPath();
-      ctx.arc(center[0] + x, center[1] + y, 6, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.font = `${fontSize}px "ABeeZee", sans-serif`;
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'center';
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', (center[0] + x).toString());
+      dot.setAttribute('cy', (center[1] + y).toString());
+      dot.setAttribute('r', '6');
+      svg.appendChild(dot);
+
       if (this.modulus < 70) {
-        ctx.fillText(i.toString(), center[0] + x2, center[1] + y2);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', (center[0] + x2).toString());
+        label.setAttribute('y', (center[1] + y2).toString());
+        label.setAttribute('class', 'mod-ring-label');
+        label.setAttribute('font-size', `${fontSize}px`);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('dominant-baseline', 'middle');
+        label.textContent = i.toString();
+        svg.appendChild(label);
       }
-      ctx.closePath();
     }
   }
 
-  drawIn(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('Canvas not supported');
+  drawIn(svg: SVGSVGElement) {
+    const width = this.width * 2;
+    const height = this.height * 2;
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.setAttribute('width', this.width.toString());
+    svg.setAttribute('height', this.height.toString());
+    while (svg.firstChild) {
+      svg.removeChild(svg.firstChild);
     }
-    const width = canvas.width = this.width * 2;
-    const height = canvas.height = this.height * 2;
-    canvas.style.width = this.width + 'px';
-    canvas.style.height = this.height + 'px';
+
     const center = [width / 2, height / 2];
     const radius = width * 0.43;
 
-    ctx.clearRect(0, 0, width, height);
-    this.drawCircle(ctx, center, radius);
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 4;
+    this.drawCircle(svg, center, radius);
 
     if (this.singlePath) {
-      this.drawPathIn(ctx, center, radius);
+      this.drawPathIn(svg, center, radius);
     } else {
-      this.drawAllIn(ctx, center, radius);
+      this.drawAllIn(svg, center, radius);
     }
   }
 
@@ -101,7 +106,7 @@ export default class ModRing {
     return Math.PI / 2 - 2 * Math.PI * i / this.modulus;
   }
 
-  drawAllIn(ctx: CanvasRenderingContext2D, center: number[], radius: number) {
+  drawAllIn(svg: SVGSVGElement, center: number[], radius: number) {
     for (let i = 0; i < this.modulus; i++) {
       const angle = this.getAngle(i);
       const x = radius * Math.cos(angle);
@@ -111,11 +116,11 @@ export default class ModRing {
       const xj = radius * Math.cos(anglej);
       const yj = -radius * Math.sin(anglej);
 
-      drawLine(ctx, center[0] + x, center[0] + y, center[0] + xj, center[0] + yj, this.drawArrows);
+      drawLine(svg, center[0] + x, center[1] + y, center[0] + xj, center[1] + yj, this.drawArrows);
     }
   }
 
-  drawPathIn(ctx: CanvasRenderingContext2D, center: number[], radius: number) {
+  drawPathIn(svg: SVGSVGElement, center: number[], radius: number) {
     const start = this.start;
     let path: number[] = [];
     let current = start;
@@ -138,36 +143,42 @@ export default class ModRing {
       const anglej = this.getAngle(j);
       const xj = radius * Math.cos(anglej);
       const yj = -radius * Math.sin(anglej);
-      drawLine(ctx, center[0] + x, center[0] + y, center[0] + xj, center[0] + yj, this.drawArrows);
+      drawLine(svg, center[0] + x, center[1] + y, center[0] + xj, center[1] + yj, this.drawArrows);
     });
   }
 }
 
-function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, arrow: boolean = false, size: number = 20, offset: number = 30) {
-
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
+function drawLine(svg: SVGSVGElement, x1: number, y1: number, x2: number, y2: number, arrow: boolean = false, size: number = 20, offset: number = 30) {
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', x1.toString());
+  line.setAttribute('y1', y1.toString());
+  line.setAttribute('x2', x2.toString());
+  line.setAttribute('y2', y2.toString());
+  line.setAttribute('class', 'mod-ring-line');
+  line.setAttribute('stroke-width', '4');
+  svg.appendChild(line);
 
   if (arrow) {
     const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    const unitVector = [(x2 - x1) / length, (y2 - y1) / length];
-    const normalVector = [-unitVector[1], unitVector[0]];
-    const pt0 = [
-      x2 - unitVector[0] * (size + offset) + normalVector[0] * size / 2,
-      y2 - unitVector[1] * (size + offset) + normalVector[1] * size / 2
-    ];
-    const pt1 = [x2 - unitVector[0] * offset, y2 - unitVector[1] * offset];
-    const pt2 = [
-      x2 - unitVector[0] * (size + offset) - normalVector[0] * size / 2,
-      y2 - unitVector[1] * (size + offset) - normalVector[1] * size / 2
-    ];
-
-    ctx.moveTo(pt0[0], pt0[1]);
-    ctx.lineTo(pt1[0], pt1[1]);
-    ctx.lineTo(pt2[0], pt2[1]);
+    if (length === 0) {
+      return;
+    }
+    const unitX = (x2 - x1) / length;
+    const unitY = (y2 - y1) / length;
+    const normalX = -unitY;
+    const normalY = unitX;
+    const tipX = x2 - unitX * offset;
+    const tipY = y2 - unitY * offset;
+    const baseX = x2 - unitX * (size + offset);
+    const baseY = y2 - unitY * (size + offset);
+    const arrowhead = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrowhead.setAttribute('points', [
+      `${baseX + normalX * size / 2},${baseY + normalY * size / 2}`,
+      `${tipX},${tipY}`,
+      `${baseX - normalX * size / 2},${baseY - normalY * size / 2}`
+    ].join(' '));
+    arrowhead.setAttribute('class', 'mod-ring-arrowhead');
+    arrowhead.setAttribute('stroke-width', '4');
+    svg.appendChild(arrowhead);
   }
-
-  ctx.stroke();
-  ctx.closePath();
 }
