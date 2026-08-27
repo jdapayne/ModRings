@@ -3,8 +3,27 @@ body {
   font-size: 16pt;
 }
 
-canvas {
+svg {
   margin: 20px;
+}
+
+.mod-ring-circle {
+  fill: none;
+  stroke: #2b4b6f;
+}
+
+.mod-ring-line,
+.mod-ring-arrowhead {
+  stroke: #386cb2;
+}
+
+.mod-ring-arrowhead {
+  fill: #386cb2;
+}
+
+.mod-ring-label {
+  font-family: "ABeeZee", sans-serif;
+  fill: #2b4b6f;
 }
 
 input[type="number"] {
@@ -19,6 +38,10 @@ input[type="number"] {
   width: -moz-fit-content;
   width: fit-content;
   background-color: #EFEFCF;
+}
+
+button {
+  font: inherit;
 }
 
 .abeezee-regular {
